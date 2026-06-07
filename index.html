@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0045)file:///C:/Users/aaawa/Downloads/index_4.html -->
+<!-- saved from url=(0045)file:///C:/Users/aaawa/Downloads/index_5.html -->
 <html lang="th"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
@@ -320,7 +320,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:#1a1a2e}
 // ════════════════════════════════════════════════════════════
 // ⚙️  CONFIG — เปลี่ยน URL หลัง deploy Apps Script
 // ════════════════════════════════════════════════════════════
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwXeLZau4ese0eUly2oMJcLEZnmZlgJgyPi3dDEZ4dpvONFabATVYjsSNsMWPW-SY7pDA/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx1t_q5AN1TjyKuC7VGqSBppci0TSUqzezmw6iIK_EO7o8EtwR3vdkyqSPUwFw9hfcbqA/exec';
 const GOAL = 30;
 
 // ════════════════════════════════════════════════════════════
@@ -389,7 +389,7 @@ function setSyncStatus(status, msg) {
 }
 
 async function syncFromSheets() {
-  if (APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbwXeLZau4ese0eUly2oMJcLEZnmZlgJgyPi3dDEZ4dpvONFabATVYjsSNsMWPW-SY7pDA/exec') {
+  if (APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbx1t_q5AN1TjyKuC7VGqSBppci0TSUqzezmw6iIK_EO7o8EtwR3vdkyqSPUwFw9hfcbqA/exec') {
     setSyncStatus('error', '⚠️ ยังไม่ได้ตั้งค่า Apps Script URL');
     return;
   }
@@ -412,7 +412,7 @@ async function syncFromSheets() {
 }
 
 async function postToSheets(action, payload) {
-  if (APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbwXeLZau4ese0eUly2oMJcLEZnmZlgJgyPi3dDEZ4dpvONFabATVYjsSNsMWPW-SY7pDA/exec') return;
+  if (APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbx1t_q5AN1TjyKuC7VGqSBppci0TSUqzezmw6iIK_EO7o8EtwR3vdkyqSPUwFw9hfcbqA/exec') return;
   try {
     setSyncStatus('syncing', 'กำลังบันทึก...');
     await fetch(APPS_SCRIPT_URL, {
@@ -509,7 +509,7 @@ async function loadHistory(days, btn) {
   if (btn) btn.classList.add('active');
   const el = document.getElementById('history-list');
   el.innerHTML = '<div class="empty-msg">กำลังโหลด...</div>';
-  if (APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbwXeLZau4ese0eUly2oMJcLEZnmZlgJgyPi3dDEZ4dpvONFabATVYjsSNsMWPW-SY7pDA/exec') {
+  if (APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbx1t_q5AN1TjyKuC7VGqSBppci0TSUqzezmw6iIK_EO7o8EtwR3vdkyqSPUwFw9hfcbqA/exec') {
     el.innerHTML = '<div class="empty-msg">⚠️ ยังไม่ได้ตั้งค่า Apps Script URL</div>';
     return;
   }
