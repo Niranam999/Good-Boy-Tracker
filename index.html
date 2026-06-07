@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>น้องปุญญ์ Good Boy Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+/* ── CONFIG ── แก้ตรงนี้เมื่อ deploy Apps Script แล้ว */
+/* APPS_SCRIPT_URL อยู่ใน <script> ด้านล่าง */
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Nunito',sans-serif;background:#1a1a2e}
+.app{background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);min-height:100vh;padding:12px;color:white;max-width:480px;margin:0 auto}
+
+/* Trainer Card */
+.trainer-card{background:linear-gradient(135deg,#FFD700,#FFA500);border-radius:16px;padding:14px;margin-bottom:12px;border:3px solid #fff;position:relative;overflow:hidden}
+.trainer-card::before{content:'';position:absolute;top:-20px;right:-20px;width:80px;height:80px;background:rgba(255,255,255,0.15);border-radius:50%}
+.trainer-name{font-family:'Press Start 2P',monospace;font-size:9px;color:#1A1A2E;margin-bottom:4px}
+.score-row{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.score-box{background:rgba(255,255,255,0.9);border-radius:10px;padding:6px 4px;text-align:center;border:2px solid rgba(0,0,0,0.1)}
+.score-label{font-size:7px;color:#555;font-weight:700;text-transform:uppercase;letter-spacing:0.3px;margin-bottom:2px}
+.score-val{font-family:'Press Start 2P',monospace;font-size:13px;line-height:1.3}
+.score-val.today{color:#E3350D}
+.score-val.accum{color:#3B5BA5}
+.score-val.remain{color:#E3350D}
+.score-val.grand{color:#9B59B6}
+
+/* EXP bar */
+.exp-bar-wrap{background:rgba(255,255,255,0.9);border-radius:10px;padding:8px;margin-top:8px;border:2px solid rgba(0,0,0,0.1)}
+.exp-label{font-size:9px;color:#555;font-weight:700;margin-bottom:4px}
+.exp-bar{background:#ddd;border-radius:20px;height:14px;overflow:hidden}
+.exp-fill{height:100%;background:linear-gradient(90deg,#4CAF50,#8BC34A);border-radius:20px;transition:width 0.5s ease;position:relative}
+.exp-fill::after{content:'';position:absolute;top:2px;left:4px;right:4px;height:4px;background:rgba(255,255,255,0.4);border-radius:10px}
+.exp-text{font-size:9px;color:#333;font-weight:700;text-align:right;margin-top:2px}
+
+/* Sync status */
+.sync-bar{display:flex;align-items:center;gap:6px;padding:6px 10px;background:rgba(255,255,255,0.08);border-radius:8px;margin-bottom:10px;font-size:10px;font-weight:700}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:#4CAF50;flex-shrink:0}
+.sync-dot.syncing{background:#FFD700;animation:pulse 1s infinite}
+.sync-dot.error{background:#E3350D}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+
+/* Tabs */
+.tabs{display:flex;gap:6px;margin-bottom:12px}
+.tab{flex:1;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:10px;padding:8px;text-align:center;cursor:pointer;font-size:10px;font-weight:800;color:rgba(255,255,255,0.6);transition:all 0.2s}
+.tab.active{background:#FFD700;color:#1A1A2E;border-color:#FFD700}
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+/* Activity cards */
+.activity-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.act-card{background:#16213e;border:2px solid #3B5BA5;border-radius:12px;padding:10px;position:relative}
+.act-card.plus-minus{border-color:#E3350D}
+.act-card.plus-only{border-color:#4CAF50}
+.act-counter-badge{position:absolute;top:8px;right:8px;font-family:'Press Start 2P',monospace;font-size:8px;color:#FFD700;background:rgba(0,0,0,0.4);border-radius:6px;padding:2px 5px;line-height:1.4;text-align:center}
+.act-counter-badge.full{color:#aaa}
+.act-icon{font-size:22px;text-align:center;margin-bottom:4px;margin-top:4px}
+.act-name{font-size:20px;font-weight:800;color:#fff;text-align:center;line-height:1.3;margin-bottom:4px;min-height:52px;display:flex;align-items:center;justify-content:center}
+.act-pts{font-family:'Press Start 2P',monospace;font-size:8px;text-align:center;margin-bottom:6px}
+.limit-bar{display:flex;gap:2px;justify-content:center;margin-bottom:6px}
+.pip{width:12px;height:6px;border-radius:3px;background:rgba(255,255,255,0.2)}
+.pip.filled{background:#E3350D}
+.pip.filled.po{background:#FFD700}
+.btn-row{display:flex;gap:4px}
+.btn-do{flex:1;background:#4CAF50;color:#fff;border:none;border-radius:8px;padding:5px 0;font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;cursor:pointer;transition:transform 0.1s}
+.btn-do:active{transform:scale(0.95)}
+.btn-undo{flex:1;background:#E3350D;color:#fff;border:none;border-radius:8px;padding:5px 0;font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;cursor:pointer;transition:transform 0.1s}
+.btn-undo:active{transform:scale(0.95)}
+.btn-do:disabled,.btn-undo:disabled{opacity:0.4;cursor:not-allowed}
+
+/* Rewards */
+.rewards-section{background:#16213e;border:2px solid #FFD700;border-radius:14px;padding:12px;margin-bottom:12px}
+.section-title{font-family:'Press Start 2P',monospace;font-size:8px;color:#FFD700;margin:0 0 8px;text-shadow:1px 1px 0 #000}
+.reward-item{display:flex;align-items:center;gap:10px;padding:8px;background:rgba(255,255,255,0.05);border-radius:10px;margin-bottom:6px;border:1px solid rgba(255,215,0,0.2)}
+.reward-icon{font-size:24px;flex-shrink:0}
+.reward-info{flex:1}
+.reward-name{font-size:13px;font-weight:800;color:#fff;line-height:1.4}
+.reward-sub{font-size:11px;font-weight:700;color:rgba(255,255,255,0.55)}
+.reward-cost{font-family:'Press Start 2P',monospace;font-size:8px;color:#FFD700;margin-top:3px}
+.btn-redeem{background:linear-gradient(135deg,#FFD700,#FFA500);color:#1A1A2E;border:none;border-radius:8px;padding:6px 10px;font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.btn-redeem:active{transform:scale(0.95)}
+.btn-redeem:disabled{opacity:0.4;background:#888;cursor:not-allowed;color:#fff}
+
+/* History */
+.history-item{background:rgba(255,255,255,0.05);border-radius:8px;padding:8px;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center}
+.history-item .hi-left{flex:1}
+.history-item .hi-date{font-size:9px;color:rgba(255,255,255,0.4);font-weight:700}
+.history-item .hi-name{font-size:11px;color:rgba(255,255,255,0.8)}
+.history-item .pts{font-family:'Press Start 2P',monospace;font-size:9px;flex-shrink:0;margin-left:8px}
+.history-item .pts.pos{color:#4CAF50}
+.history-item .pts.neg{color:#E3350D}
+.history-filter{display:flex;gap:6px;margin-bottom:8px}
+.filter-btn{flex:1;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:8px;padding:5px;font-size:10px;font-weight:800;color:rgba(255,255,255,0.6);cursor:pointer}
+.filter-btn.active{background:#FFD700;color:#1A1A2E;border-color:#FFD700}
+.reset-btn{width:100%;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.5);border-radius:8px;padding:8px;font-size:11px;font-weight:700;cursor:pointer;margin-top:8px}
+
+/* Toast */
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-80px);background:#FFD700;color:#1A1A2E;font-family:'Press Start 2P',monospace;font-size:9px;padding:8px 16px;border-radius:10px;border:2px solid #E3350D;z-index:999;transition:transform 0.3s ease;pointer-events:none;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* No data */
+.empty-msg{text-align:center;color:rgba(255,255,255,0.4);font-size:12px;padding:16px}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <div id="toast" class="toast"></div>
+
+  <!-- Trainer Card -->
+  <div class="trainer-card">
+    <div class="trainer-name">⭐ Trainer Card</div>
+    <div style="font-size:13px;color:#1A1A2E;margin-bottom:8px;font-weight:800">น้องปุญญ์ 🏆</div>
+    <div class="score-row">
+      <div class="score-box">
+        <div class="score-label">วันนี้</div>
+        <div class="score-val today" id="today-score">0</div>
+      </div>
+      <div class="score-box">
+        <div class="score-label">สะสมรวม</div>
+        <div class="score-val accum" id="accum-score">0</div>
+      </div>
+      <div class="score-box">
+        <div class="score-label">คงเหลือ</div>
+        <div class="score-val remain" id="remain-score">0</div>
+      </div>
+      <div class="score-box">
+        <div class="score-label">เด็กดีทั้งหมด</div>
+        <div class="score-val grand" id="grand-score">0</div>
+      </div>
+    </div>
+    <div class="exp-bar-wrap">
+      <div class="exp-label">🎯 คะแนนวันนี้</div>
+      <div class="exp-bar"><div class="exp-fill" id="exp-fill" style="width:0%"></div></div>
+      <div class="exp-text" id="exp-text">0 / 30</div>
+    </div>
+  </div>
+
+  <!-- Sync status -->
+  <div class="sync-bar">
+    <div class="sync-dot" id="sync-dot"></div>
+    <span id="sync-text">เชื่อมต่อ Google Sheets...</span>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('activities')">⚔️ กิจกรรม</div>
+    <div class="tab" onclick="switchTab('rewards')">🎁 รางวัล</div>
+    <div class="tab" onclick="switchTab('history')">📜 ประวัติ</div>
+  </div>
+
+  <div id="tab-activities" class="tab-content active"></div>
+
+  <div id="tab-rewards" class="tab-content">
+    <div class="rewards-section">
+      <div class="section-title">🏆 แลกรางวัล</div>
+      <div id="reward-list"></div>
+    </div>
+  </div>
+
+  <div id="tab-history" class="tab-content">
+    <div class="rewards-section">
+      <div class="section-title">📜 ประวัติย้อนหลัง</div>
+      <div class="history-filter">
+        <button class="filter-btn active" onclick="loadHistory(1,this)">วันนี้</button>
+        <button class="filter-btn" onclick="loadHistory(7,this)">7 วัน</button>
+        <button class="filter-btn" onclick="loadHistory(30,this)">30 วัน</button>
+      </div>
+      <div id="history-list"><div class="empty-msg">กำลังโหลด...</div></div>
+      <button class="reset-btn" onclick="resetDay()">🔄 รีเซ็ตวันใหม่</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════
+// ⚙️  CONFIG — เปลี่ยน URL หลัง deploy Apps Script
+// ════════════════════════════════════════════════════════════
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwXeLZau4ese0eUly2oMJcLEZnmZlgJgyPi3dDEZ4dpvONFabATVYjsSNsMWPW-SY7pDA/exec';
+const GOAL = 30;
+
+// ════════════════════════════════════════════════════════════
+// DATA
+// ════════════════════════════════════════════════════════════
+const ACTIVITIES = [
+  {id:'toilet',   icon:'🚽', name:'ฉี่แล้วกดน้ำ',                                           type:'pm',      pts:1, penalty:-1, limit:3},
+  {id:'dish',     icon:'🍽️', name:'กินข้าวแล้วเก็บจาน',                                      type:'pm',      pts:1, penalty:-1, limit:3},
+  {id:'sweep_own',icon:'🧹', name:'กวาดขยะของตัวเอง',                                        type:'pm',      pts:1, penalty:-1, limit:3},
+  {id:'sweep_all',icon:'🏠', name:'กวาดทั้งบ้าน',                                            type:'pm',      pts:5, penalty:-5, limit:1},
+  {id:'fold',     icon:'👕', name:'พับผ้า 10 ชิ้น',                                          type:'po',      pts:2,            limit:2},
+  {id:'books',    icon:'📚', name:'จัดหนังสือถูกต้อง',                                       type:'pm',      pts:1, penalty:-1, limit:1},
+  {id:'poop',     icon:'💩', name:'อึ',                                                       type:'po',      pts:2,            limit:2},
+  {id:'milk',     icon:'🥛', name:'กินนม 1 กล่อง',                                           type:'pm',      pts:1, penalty:-1, limit:3},
+  {id:'veggie',   icon:'🥦', name:'กินผักหมด',                                               type:'po',      pts:1,            limit:3},
+  {id:'shower',   icon:'🚿', name:'กลับบ้านอาบน้ำเลย',                                      type:'po',      pts:1,            limit:1},
+  {id:'palfish',  icon:'🗣️', name:'เรียน Palfish ตั้งใจ + ทำแบบฝึกหัดหลังเรียนทันที',      type:'special', pts:2, penalty:-1, limit:2},
+];
+
+const REWARDS = [
+  {id:'snack',   icon:'🍬', name:'ขนม 1 ห่อ',              sub:'(งบ 25 บาท)',          cost:25},
+  {id:'pokemon', icon:'🃏', name:'การ์ดโปเกม่อน 1 ซอง',    sub:'(หรือของอื่น งบ 50 บาท)', cost:50},
+  {id:'big',     icon:'🎁', name:'ของรางวัลใหญ่',           sub:'(งบ 250 บาท)',         cost:200},
+];
+
+// ════════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════════
+let state = {today:{}, accumScore:0, redeemable:0, grandTotal:0, date:getTodayStr()};
+
+function getTodayStr() {
+  return new Date().toLocaleDateString('th-TH');
+}
+
+// ── Local Storage ─────────────────────────────────────────────
+function loadLocal() {
+  try {
+    const s = localStorage.getItem('goodboy_v1');
+    if (s) {
+      const p = JSON.parse(s);
+      if (p.date === getTodayStr()) {
+        state = p;
+      } else {
+        // new day — keep scores, reset today
+        state.accumScore  = p.accumScore  || 0;
+        state.redeemable  = p.redeemable  || 0;
+        state.grandTotal  = p.grandTotal  || 0;
+        state.today = {};
+        state.date  = getTodayStr();
+      }
+    }
+  } catch(e) {}
+}
+
+function saveLocal() {
+  try { localStorage.setItem('goodboy_v1', JSON.stringify(state)); } catch(e) {}
+}
+
+// ── Google Sheets sync ────────────────────────────────────────
+function setSyncStatus(status, msg) {
+  const dot  = document.getElementById('sync-dot');
+  const text = document.getElementById('sync-text');
+  dot.className = 'sync-dot' + (status === 'syncing' ? ' syncing' : status === 'error' ? ' error' : '');
+  text.textContent = msg;
+}
+
+async function syncFromSheets() {
+  if (APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbwXeLZau4ese0eUly2oMJcLEZnmZlgJgyPi3dDEZ4dpvONFabATVYjsSNsMWPW-SY7pDA/exec') {
+    setSyncStatus('error', '⚠️ ยังไม่ได้ตั้งค่า Apps Script URL');
+    return;
+  }
+  setSyncStatus('syncing', 'กำลังโหลดจาก Google Sheets...');
+  try {
+    const res  = await fetch(APPS_SCRIPT_URL + '?action=getState');
+    const data = await res.json();
+    if (data.found) {
+      // merge — Sheets wins for cumulative scores, local wins for today's activity
+      state.accumScore = data.accumScore || state.accumScore;
+      state.redeemable = data.redeemable || state.redeemable;
+      state.grandTotal = data.grandTotal || state.grandTotal;
+    }
+    setSyncStatus('ok', 'ซิงค์แล้ว ' + new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'}));
+    saveLocal();
+    render();
+  } catch(e) {
+    setSyncStatus('error', 'ออฟไลน์ — ใช้ข้อมูลในเครื่อง');
+  }
+}
+
+async function postToSheets(action, payload) {
+  if (APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbwXeLZau4ese0eUly2oMJcLEZnmZlgJgyPi3dDEZ4dpvONFabATVYjsSNsMWPW-SY7pDA/exec') return;
+  try {
+    setSyncStatus('syncing', 'กำลังบันทึก...');
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action, ...payload })
+    });
+    setSyncStatus('ok', 'บันทึกแล้ว ' + new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'}));
+  } catch(e) {
+    setSyncStatus('error', 'บันทึกไม่ได้ — จะลองใหม่');
+  }
+}
+
+async function saveSummaryToSheets() {
+  await postToSheets('saveState', {
+    todayScore: getTodayScore(),
+    accumScore: state.accumScore,
+    redeemable: state.redeemable,
+    grandTotal: state.grandTotal
+  });
+}
+
+// ════════════════════════════════════════════════════════════
+// GAME LOGIC
+// ════════════════════════════════════════════════════════════
+function getTodayScore() {
+  let s = 0;
+  ACTIVITIES.forEach(a => {
+    const c = state.today[a.id] || 0;
+    if (c > 0) s += Math.min(c, a.limit) * a.pts;
+    else if (c < 0) s += c * Math.abs(a.penalty || a.pts);
+  });
+  return s;
+}
+
+async function doActivity(id) {
+  const a = ACTIVITIES.find(x => x.id === id);
+  const cur = state.today[a.id] || 0;
+  if (cur >= a.limit) { showToast('ถึงลิมิตแล้ว! 🚫'); return; }
+  state.today[a.id] = (state.today[a.id] || 0) + 1;
+  state.accumScore += a.pts;
+  state.redeemable += a.pts;
+  state.grandTotal += a.pts;
+  showToast('+' + a.pts + ' คะแนน! ' + a.icon);
+  saveLocal(); render();
+  await postToSheets('logActivity', {
+    activityId: a.id, activityName: a.name, points: a.pts, type: 'earn',
+    accumScore: state.accumScore, redeemable: state.redeemable, grandTotal: state.grandTotal
+  });
+  await saveSummaryToSheets();
+}
+
+async function undoActivity(id) {
+  const a = ACTIVITIES.find(x => x.id === id);
+  if (a.type === 'po') { showToast('กิจกรรมนี้ไม่หักคะแนน 💚'); return; }
+  const pen = a.id === 'palfish' ? -1 : -(a.pts);
+  state.today[a.id] = (state.today[a.id] || 0) - 1;
+  state.accumScore += pen;
+  state.redeemable  = Math.max(0, state.redeemable + pen);
+  state.grandTotal += pen;
+  showToast(pen + ' คะแนน ' + a.icon + ' 😅');
+  saveLocal(); render();
+  await postToSheets('logActivity', {
+    activityId: a.id, activityName: a.name + ' (ลืม)', points: pen, type: 'deduct',
+    accumScore: state.accumScore, redeemable: state.redeemable, grandTotal: state.grandTotal
+  });
+  await saveSummaryToSheets();
+}
+
+async function redeemReward(id) {
+  const r = REWARDS.find(x => x.id === id);
+  if (state.redeemable < r.cost) { showToast('คะแนนไม่พอ! 😢'); return; }
+  state.redeemable  -= r.cost;
+  state.accumScore  -= r.cost;
+  showToast('แลกรางวัลแล้ว! ' + r.icon + ' 🎉');
+  saveLocal(); render();
+  await postToSheets('logReward', {
+    rewardId: r.id, rewardName: r.name, cost: r.cost, redeemableAfter: state.redeemable
+  });
+  await saveSummaryToSheets();
+}
+
+function resetDay() {
+  if (!confirm('รีเซ็ตวันใหม่?')) return;
+  state.today = {};
+  state.date  = getTodayStr();
+  saveLocal(); render();
+}
+
+// ════════════════════════════════════════════════════════════
+// HISTORY
+// ════════════════════════════════════════════════════════════
+async function loadHistory(days, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  const el = document.getElementById('history-list');
+  el.innerHTML = '<div class="empty-msg">กำลังโหลด...</div>';
+  if (APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbwXeLZau4ese0eUly2oMJcLEZnmZlgJgyPi3dDEZ4dpvONFabATVYjsSNsMWPW-SY7pDA/exec') {
+    el.innerHTML = '<div class="empty-msg">⚠️ ยังไม่ได้ตั้งค่า Apps Script URL</div>';
+    return;
+  }
+  try {
+    const res  = await fetch(APPS_SCRIPT_URL + '?action=getHistory&days=' + days);
+    const data = await res.json();
+    if (!data.rows || data.rows.length === 0) {
+      el.innerHTML = '<div class="empty-msg">ยังไม่มีประวัติ</div>';
+      return;
+    }
+    el.innerHTML = data.rows.map(r => {
+      const pts = parseFloat(r.points);
+      const pos = pts > 0;
+      const time = new Date(r.timestamp).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
+      return `<div class="history-item">
+        <div class="hi-left">
+          <div class="hi-date">${r.date} ${time}</div>
+          <div class="hi-name">${r.activityName}</div>
+        </div>
+        <span class="pts ${pos?'pos':'neg'}">${pos?'+':''}${pts}</span>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    el.innerHTML = '<div class="empty-msg">โหลดไม่ได้ — ตรวจสอบการเชื่อมต่อ</div>';
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+// UI
+// ════════════════════════════════════════════════════════════
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach((t, i) => {
+    t.classList.toggle('active', ['activities','rewards','history'][i] === name);
+  });
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  if (name === 'history') loadHistory(1, document.querySelector('.filter-btn'));
+}
+
+function render() {
+  const todayPts = getTodayScore();
+  document.getElementById('today-score').textContent  = todayPts;
+  document.getElementById('accum-score').textContent  = state.accumScore;
+  document.getElementById('remain-score').textContent = state.redeemable;
+  document.getElementById('grand-score').textContent  = state.grandTotal;
+  const pct = Math.min(100, Math.round(todayPts / GOAL * 100));
+  document.getElementById('exp-fill').style.width = pct + '%';
+  document.getElementById('exp-text').textContent = todayPts + ' / ' + GOAL;
+
+  // Activities
+  document.getElementById('tab-activities').innerHTML =
+    '<div class="activity-grid">' +
+    ACTIVITIES.map(a => {
+      const cur  = state.today[a.id] || 0;
+      const done = Math.max(0, cur);
+      const full = done >= a.limit;
+      const pips = Array(a.limit).fill(0).map((_,i) =>
+        `<div class="pip ${i<done?(a.type==='po'?'filled po':'filled'):''}"></div>`
+      ).join('');
+      const label = a.type==='po'
+        ? `<span style="color:#4CAF50">+${a.pts} only</span>`
+        : a.id==='palfish'
+          ? `<span style="color:#FFD700">+2 / -1</span>`
+          : `<span style="color:#FFD700">+${a.pts} / -${a.pts}</span>`;
+      const undoBtn = a.type!=='po'
+        ? `<button class="btn-undo" onclick="undoActivity('${a.id}')">✗ ลืม</button>` : '';
+      return `<div class="act-card ${a.type==='po'?'plus-only':'plus-minus'}">
+        <div class="act-counter-badge ${full?'full':''}">คะแนนวันนี้<br>(${done}/${a.limit})</div>
+        <div class="act-icon">${a.icon}</div>
+        <div class="act-name">${a.name}</div>
+        <div class="act-pts">${label}</div>
+        <div class="limit-bar">${pips}</div>
+        <div class="btn-row">
+          <button class="btn-do" onclick="doActivity('${a.id}')" ${full?'disabled':''}>✓ ทำแล้ว</button>
+          ${undoBtn}
+        </div>
+      </div>`;
+    }).join('') + '</div>';
+
+  // Rewards
+  document.getElementById('reward-list').innerHTML = REWARDS.map(r =>
+    `<div class="reward-item">
+      <div class="reward-icon">${r.icon}</div>
+      <div class="reward-info">
+        <div class="reward-name">${r.name} <span class="reward-sub">${r.sub}</span></div>
+        <div class="reward-cost">${r.cost} คะแนน</div>
+      </div>
+      <button class="btn-redeem" onclick="redeemReward('${r.id}')" ${state.redeemable<r.cost?'disabled':''}>แลก!</button>
+    </div>`
+  ).join('');
+}
+
+// ════════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════════
+loadLocal();
+render();
+syncFromSheets();
+</script>
+</body>
+</html>
