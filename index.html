@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<!-- saved from url=(0045)file:///C:/Users/aaawa/Downloads/index_7.html -->
-<html lang="th"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
+<html lang="th">
+<head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>น้องปุญญ์ Good Boy Tracker</title>
-<link rel="preconnect" href="https://fonts.googleapis.com/">
-<link href="./index_files/css2" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
 <style>
 /* ── CONFIG ── แก้ตรงนี้เมื่อ deploy Apps Script แล้ว */
 /* APPS_SCRIPT_URL อยู่ใน <script> ด้านล่าง */
@@ -141,164 +141,23 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:#1a1a2e}
 
   <!-- Sync status -->
   <div class="sync-bar">
-    <div class="sync-dot error" id="sync-dot"></div>
-    <span id="sync-text">ออฟไลน์ — ใช้ข้อมูลในเครื่อง</span>
+    <div class="sync-dot" id="sync-dot"></div>
+    <span id="sync-text">เชื่อมต่อ Google Sheets...</span>
   </div>
 
   <!-- Tabs -->
   <div class="tabs">
-    <div class="tab active" onclick="switchTab(&#39;activities&#39;)">⚔️ กิจกรรม</div>
-    <div class="tab" onclick="switchTab(&#39;rewards&#39;)">🎁 รางวัล</div>
-    <div class="tab" onclick="switchTab(&#39;history&#39;)">📜 ประวัติ</div>
+    <div class="tab active" onclick="switchTab('activities')">⚔️ กิจกรรม</div>
+    <div class="tab" onclick="switchTab('rewards')">🎁 รางวัล</div>
+    <div class="tab" onclick="switchTab('history')">📜 ประวัติ</div>
   </div>
 
-  <div id="tab-activities" class="tab-content active"><div class="activity-grid"><div class="act-card plus-minus">
-        <div class="act-counter-badge ">คะแนนวันนี้<br>(0/3)</div>
-        <div class="act-icon">🚽</div>
-        <div class="act-name">ฉี่แล้วกดน้ำ</div>
-        <div class="act-pts"><span style="color:#FFD700">+1 / -1</span></div>
-        <div class="limit-bar"><div class="pip "></div><div class="pip "></div><div class="pip "></div></div>
-        <div class="btn-row">
-          <button class="btn-do" onclick="doActivity(&#39;toilet&#39;)">✓ ทำแล้ว</button>
-          <button class="btn-undo" onclick="undoActivity(&#39;toilet&#39;)">✗ ลืม</button>
-        </div>
-      </div><div class="act-card plus-minus">
-        <div class="act-counter-badge ">คะแนนวันนี้<br>(0/3)</div>
-        <div class="act-icon">🍽️</div>
-        <div class="act-name">กินข้าวแล้วเก็บจาน</div>
-        <div class="act-pts"><span style="color:#FFD700">+1 / -1</span></div>
-        <div class="limit-bar"><div class="pip "></div><div class="pip "></div><div class="pip "></div></div>
-        <div class="btn-row">
-          <button class="btn-do" onclick="doActivity(&#39;dish&#39;)">✓ ทำแล้ว</button>
-          <button class="btn-undo" onclick="undoActivity(&#39;dish&#39;)">✗ ลืม</button>
-        </div>
-      </div><div class="act-card plus-minus">
-        <div class="act-counter-badge ">คะแนนวันนี้<br>(0/3)</div>
-        <div class="act-icon">🧹</div>
-        <div class="act-name">กวาดขยะของตัวเอง</div>
-        <div class="act-pts"><span style="color:#FFD700">+1 / -1</span></div>
-        <div class="limit-bar"><div class="pip "></div><div class="pip "></div><div class="pip "></div></div>
-        <div class="btn-row">
-          <button class="btn-do" onclick="doActivity(&#39;sweep_own&#39;)">✓ ทำแล้ว</button>
-          <button class="btn-undo" onclick="undoActivity(&#39;sweep_own&#39;)">✗ ลืม</button>
-        </div>
-      </div><div class="act-card plus-minus">
-        <div class="act-counter-badge ">คะแนนวันนี้<br>(0/1)</div>
-        <div class="act-icon">🏠</div>
-        <div class="act-name">กวาดทั้งบ้าน</div>
-        <div class="act-pts"><span style="color:#FFD700">+5 / -5</span></div>
-        <div class="limit-bar"><div class="pip "></div></div>
-        <div class="btn-row">
-          <button class="btn-do" onclick="doActivity(&#39;sweep_all&#39;)">✓ ทำแล้ว</button>
-          <button class="btn-undo" onclick="undoActivity(&#39;sweep_all&#39;)">✗ ลืม</button>
-        </div>
-      </div><div class="act-card plus-only">
-        <div class="act-counter-badge ">คะแนนวันนี้<br>(0/2)</div>
-        <div class="act-icon">👕</div>
-        <div class="act-name">พับผ้า 10 ชิ้น</div>
-        <div class="act-pts"><span style="color:#4CAF50">+2 only</span></div>
-        <div class="limit-bar"><div class="pip "></div><div class="pip "></div></div>
-        <div class="btn-row">
-          <button class="btn-do" onclick="doActivity(&#39;fold&#39;)">✓ ทำแล้ว</button>
-          
-        </div>
-      </div><div class="act-card plus-minus">
-        <div class="act-counter-badge ">คะแนนวันนี้<br>(0/1)</div>
-        <div class="act-icon">📚</div>
-        <div class="act-name">จัดหนังสือถูกต้อง</div>
-        <div class="act-pts"><span style="color:#FFD700">+1 / -1</span></div>
-        <div class="limit-bar"><div class="pip "></div></div>
-        <div class="btn-row">
-          <button class="btn-do" onclick="doActivity(&#39;books&#39;)">✓ ทำแล้ว</button>
-          <button class="btn-undo" onclick="undoActivity(&#39;books&#39;)">✗ ลืม</button>
-        </div>
-      </div><div class="act-card plus-only">
-        <div class="act-counter-badge ">คะแนนวันนี้<br>(0/2)</div>
-        <div class="act-icon">💩</div>
-        <div class="act-name">อึ</div>
-        <div class="act-pts"><span style="color:#4CAF50">+2 only</span></div>
-        <div class="limit-bar"><div class="pip "></div><div class="pip "></div></div>
-        <div class="btn-row">
-          <button class="btn-do" onclick="doActivity(&#39;poop&#39;)">✓ ทำแล้ว</button>
-          
-        </div>
-      </div><div class="act-card plus-minus">
-        <div class="act-counter-badge ">คะแนนวันนี้<br>(0/3)</div>
-        <div class="act-icon">🥛</div>
-        <div class="act-name">กินนม 1 กล่อง</div>
-        <div class="act-pts"><span style="color:#FFD700">+1 / -1</span></div>
-        <div class="limit-bar"><div class="pip "></div><div class="pip "></div><div class="pip "></div></div>
-        <div class="btn-row">
-          <button class="btn-do" onclick="doActivity(&#39;milk&#39;)">✓ ทำแล้ว</button>
-          <button class="btn-undo" onclick="undoActivity(&#39;milk&#39;)">✗ ลืม</button>
-        </div>
-      </div><div class="act-card plus-only">
-        <div class="act-counter-badge ">คะแนนวันนี้<br>(0/3)</div>
-        <div class="act-icon">🥦</div>
-        <div class="act-name">กินผักหมด</div>
-        <div class="act-pts"><span style="color:#4CAF50">+1 only</span></div>
-        <div class="limit-bar"><div class="pip "></div><div class="pip "></div><div class="pip "></div></div>
-        <div class="btn-row">
-          <button class="btn-do" onclick="doActivity(&#39;veggie&#39;)">✓ ทำแล้ว</button>
-          
-        </div>
-      </div><div class="act-card plus-only">
-        <div class="act-counter-badge ">คะแนนวันนี้<br>(0/1)</div>
-        <div class="act-icon">🚿</div>
-        <div class="act-name">กลับบ้านอาบน้ำเลย</div>
-        <div class="act-pts"><span style="color:#4CAF50">+1 only</span></div>
-        <div class="limit-bar"><div class="pip "></div></div>
-        <div class="btn-row">
-          <button class="btn-do" onclick="doActivity(&#39;shower&#39;)">✓ ทำแล้ว</button>
-          
-        </div>
-      </div><div class="act-card plus-minus">
-        <div class="act-counter-badge ">คะแนนวันนี้<br>(0/2)</div>
-        <div class="act-icon">🗣️</div>
-        <div class="act-name">เรียน Palfish ตั้งใจ + ทำแบบฝึกหัดหลังเรียนทันที</div>
-        <div class="act-pts"><span style="color:#FFD700">+2 / -1</span></div>
-        <div class="limit-bar"><div class="pip "></div><div class="pip "></div></div>
-        <div class="btn-row">
-          <button class="btn-do" onclick="doActivity(&#39;palfish&#39;)">✓ ทำแล้ว</button>
-          <button class="btn-undo" onclick="undoActivity(&#39;palfish&#39;)">✗ ลืม</button>
-        </div>
-      </div><div class="act-card plus-minus">
-        <div class="act-counter-badge ">คะแนนวันนี้<br>(0/3)</div>
-        <div class="act-icon">⚡</div>
-        <div class="act-name">ไม่โอ้เอ้ ไม่ชักช้า ทำทันที</div>
-        <div class="act-pts"><span style="color:#FFD700">+1 / -1</span></div>
-        <div class="limit-bar"><div class="pip "></div><div class="pip "></div><div class="pip "></div></div>
-        <div class="btn-row">
-          <button class="btn-do" onclick="doActivity(&#39;quick&#39;)">✓ ทำแล้ว</button>
-          <button class="btn-undo" onclick="undoActivity(&#39;quick&#39;)">✗ ลืม</button>
-        </div>
-      </div></div></div>
+  <div id="tab-activities" class="tab-content active"></div>
 
   <div id="tab-rewards" class="tab-content">
     <div class="rewards-section">
       <div class="section-title">🏆 แลกรางวัล</div>
-      <div id="reward-list"><div class="reward-item">
-      <div class="reward-icon">🍬</div>
-      <div class="reward-info">
-        <div class="reward-name">ขนม 1 ห่อ <span class="reward-sub">(งบ 25 บาท)</span></div>
-        <div class="reward-cost">25 คะแนน</div>
-      </div>
-      <button class="btn-redeem" onclick="redeemReward(&#39;snack&#39;)" disabled="">แลก!</button>
-    </div><div class="reward-item">
-      <div class="reward-icon">🃏</div>
-      <div class="reward-info">
-        <div class="reward-name">การ์ดโปเกม่อน 1 ซอง <span class="reward-sub">(หรือของอื่น งบ 50 บาท)</span></div>
-        <div class="reward-cost">50 คะแนน</div>
-      </div>
-      <button class="btn-redeem" onclick="redeemReward(&#39;pokemon&#39;)" disabled="">แลก!</button>
-    </div><div class="reward-item">
-      <div class="reward-icon">🎁</div>
-      <div class="reward-info">
-        <div class="reward-name">ของรางวัลใหญ่ <span class="reward-sub">(งบ 250 บาท)</span></div>
-        <div class="reward-cost">200 คะแนน</div>
-      </div>
-      <button class="btn-redeem" onclick="redeemReward(&#39;big&#39;)" disabled="">แลก!</button>
-    </div></div>
+      <div id="reward-list"></div>
     </div>
   </div>
 
@@ -338,7 +197,6 @@ const ACTIVITIES = [
   {id:'veggie',   icon:'🥦', name:'กินผักหมด',                                               type:'po',      pts:1,            limit:3},
   {id:'shower',   icon:'🚿', name:'กลับบ้านอาบน้ำเลย',                                      type:'po',      pts:1,            limit:1},
   {id:'palfish',  icon:'🗣️', name:'เรียน Palfish ตั้งใจ + ทำแบบฝึกหัดหลังเรียนทันที',      type:'special', pts:2, penalty:-1, limit:2},
-  {id:'quick',    icon:'⚡', name:'ไม่โอ้เอ้ ไม่ชักช้า ทำทันที',                           type:'pm',      pts:1, penalty:-1, limit:3},
 ];
 
 const REWARDS = [
@@ -389,7 +247,7 @@ function setSyncStatus(status, msg) {
 }
 
 async function syncFromSheets() {
-  if (APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
+  if (APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbx1t_q5AN1TjyKuC7VGqSBppci0TSUqzezmw6iIK_EO7o8EtwR3vdkyqSPUwFw9hfcbqA/exec') {
     setSyncStatus('error', '⚠️ ยังไม่ได้ตั้งค่า Apps Script URL');
     return;
   }
@@ -412,13 +270,11 @@ async function syncFromSheets() {
 }
 
 async function postToSheets(action, payload) {
-  if (APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') return;
+  if (APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbx1t_q5AN1TjyKuC7VGqSBppci0TSUqzezmw6iIK_EO7o8EtwR3vdkyqSPUwFw9hfcbqA/exec') return;
   try {
     setSyncStatus('syncing', 'กำลังบันทึก...');
-    await fetch(APPS_SCRIPT_URL, {
-      method: 'POST',
-      body: JSON.stringify({ action, ...payload })
-    });
+    const params = new URLSearchParams({ action, ...payload });
+    await fetch(APPS_SCRIPT_URL + '?' + params.toString());
     setSyncStatus('ok', 'บันทึกแล้ว ' + new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'}));
   } catch(e) {
     setSyncStatus('error', 'บันทึกไม่ได้ — จะลองใหม่');
@@ -509,7 +365,7 @@ async function loadHistory(days, btn) {
   if (btn) btn.classList.add('active');
   const el = document.getElementById('history-list');
   el.innerHTML = '<div class="empty-msg">กำลังโหลด...</div>';
-  if (APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
+  if (APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbx1t_q5AN1TjyKuC7VGqSBppci0TSUqzezmw6iIK_EO7o8EtwR3vdkyqSPUwFw9hfcbqA/exec') {
     el.innerHTML = '<div class="empty-msg">⚠️ ยังไม่ได้ตั้งค่า Apps Script URL</div>';
     return;
   }
@@ -617,6 +473,5 @@ loadLocal();
 render();
 syncFromSheets();
 </script>
-
-
-</body></html>
+</body>
+</html>
